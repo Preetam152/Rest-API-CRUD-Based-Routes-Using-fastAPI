@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Body, Depends 
+from fastapi import FastAPI, Depends 
 import schemas
 import models
 
@@ -35,14 +35,27 @@ def getItem(id:int, session:Session = Depends(get_session)):
     item = session.query(models.Item).get(id)
     return item 
 
+#option #1
+# @app.post("/")
+# def addItem(name:str):
+#     newId = len(fakeDatabase.keys()) + 1
+#     fakeDatabase[newId] = {"name":name}
+#     return fakeDatabase
+
 @app.post("/")
 def addItem(item:schemas.Item, session : Session = Depends(get_session)):
     item = models.Item(name= item.name) 
     session.add(item)
     session.commit()
-    session.refresh()
-    
+    session.refresh(item)
     return item 
+
+#Option #3
+# @app.post("/")
+# def addItem(body = Body()):
+#     newId = len(fakeDatabase.keys()) + 1
+#     fakeDatabase[newId] = {"name":body['name']}
+#     return fakeDatabase
 
 @app.put("/{id}")
 def updateItem(id:int, item:schemas.Item, session : Session = Depends(get_session)):
