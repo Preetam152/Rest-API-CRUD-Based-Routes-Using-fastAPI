@@ -28,7 +28,7 @@ fakeDatabase = {
 @app.get("/")
 def getItems(session : Session = Depends(get_session)):
     items: session.query(models.Item).all()
-    return fakeDatabase
+    return items
 
 @app.get("/{id}")
 def getItem(id:int, session:Session = Depends(get_session)):
