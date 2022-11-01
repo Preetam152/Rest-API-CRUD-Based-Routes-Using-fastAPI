@@ -5,7 +5,7 @@ import models
 from database import Base, engine, SessionLocal
 from sqlalchemy.orm import Session 
 
-Base.metadate.create_all(engine)
+Base.metadata.create_all(engine)
 
 def get_session():
     session = SessionLocal()
