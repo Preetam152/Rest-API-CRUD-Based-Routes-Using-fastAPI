@@ -1,9 +1,13 @@
-from fastapi import FastAPI, Depends 
+from fastapi import FastAPI, Depends
+import uvicorn
 import schemas
 import models
-
 from database import Base, engine, SessionLocal
 from sqlalchemy.orm import Session 
+from basiclogging import logging_config
+
+app = FastAPI()
+
 
 Base.metadata.create_all(engine)
 
@@ -26,9 +30,9 @@ fakeDatabase = {
 }
 
 @app.get("/")
-def getItems(session : Session = Depends(get_session)):
-    items: session.query(models.Item).all()
-    return items
+def getItem(session : Session = Depends(get_session)):
+    item: session.query(models.Item).all()
+    return item
 
 @app.get("/{id}")
 def getItem(id:int, session:Session = Depends(get_session)):
@@ -44,10 +48,11 @@ def getItem(id:int, session:Session = Depends(get_session)):
 
 @app.post("/")
 def addItem(item:schemas.Item, session : Session = Depends(get_session)):
-    item = models.Item(name= item.name) 
+    item = models.Item(name = item.name) 
     session.add(item)
     session.commit()
     session.refresh(item)
+
     return item 
 
 #Option #3
@@ -60,7 +65,7 @@ def addItem(item:schemas.Item, session : Session = Depends(get_session)):
 @app.put("/{id}")
 def updateItem(id:int, item:schemas.Item, session : Session = Depends(get_session)):
     itemObject= session.query(models.Item).get(id)
-    itemObject.name = item.name 
+    itemObject.name = item.name
     session.commit()
     return itemObject
 
@@ -71,4 +76,7 @@ def deleteItem(id:int, session : Session = Depends(get_session)):
     session.commit()
     session.close()
     return 'Item was deleted...'
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="127.0.0.1", port=8000, log_config=logging_config)
 
